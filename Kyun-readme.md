@@ -101,14 +101,14 @@ function double(x: number): number | undefined {
 
 - JavaScript が持っているデータ型のひとつ
 
-  - 真偽値（Boolean）
+### 真偽値（Boolean）
 
   ```javascript
   const foo: boolean = true;
   const baz: boolean = false;
   ```
 
-  - 文字列（String）
+### 文字列（String）
 
   ```javascript
   const foo: string = "kyun";
@@ -116,14 +116,14 @@ function double(x: number): number | undefined {
   const baz: string = `kyun`;
   ```
 
-  - 数値（Number）
+### 数値（Number）
 
   ```javascript
   const foo: number = 111;
   const baz: number = 0.1;
   ```
 
-  - null
+### null
     - 現在利用できない状態を表す型
     - json ファイルで使うことが可能
     - API で json を返すときには、null が使われる
@@ -133,7 +133,7 @@ function double(x: number): number | undefined {
   const foo: null = null;
   ```
 
-  - undefined
+### undefined
     - 初期化されていない状態の型
     - json ファイルで使うことは不可能
     - TypeScript の開発チームは、undefined を使うと明言
@@ -256,4 +256,131 @@ let bar = foo;
 ```javascript
 const foo = "foo" as const; /** constアサーションで、string Literal type のまま型を維持できる*/
 let bar = foo;
+```
+
+## Array, Tuple, Any, Unknown, Void, Never(6)
+
+### Array
+
+```javascript
+👌 const foo: number[] = [1, 2, 3];
+👎 const bar: number[] = [1, "2", 3];
+👌 const baz: Array<number> = [1, 2, 3];
+```
+
+##### Union type
+
+```javascript
+const kyun: (number | string)[] = [1, "2", 3];
+```
+
+### Tuple
+
+  - 一つ一つの要素に対して型をつけることができる
+  - 要素の順番が決まっている
+  - 要素の数が決まっている
+
+  ```javascript
+  const foo: [string, number] = ["foo", 1];
+  ```
+
+  #### メリット
+
+  - 要素が持っているメソッドを補完してくれる
+
+### Any
+
+  - 型が不明なときに、型チェックを無効にして、コンパイルを無理やり通す時に使われる
+  - 基本的に多用して良いものではない
+  - js から Ts に型付けする場合、全てを変更できないため、一度 any 型にして順を追って型付けしていく
+
+  ```javascript
+  👌 const foo: any = true;
+  👌 const bar: any = 123;
+  👌 const baz: any = "kyun";
+  ```
+
+### Unknown
+
+  - 型が不明な時に使う点は、any と似ている
+  - any より安全にしたい場合に使われる
+  - 利用するときに型がしっかりと評価されるため安全
+
+  ```javascript
+  👌 const foo: unknown = true;
+  👌 const bar: unknown = 123;
+  👌 const baz: unknown = "kyun";
+  ```
+
+  ```javascript
+  👌 const baz: unknown = "kyun";
+  if (typeof baz === "string") {
+    baz.substr(2);
+  }
+  ```
+
+### Void
+
+  - 関数の返り値がない場合によく使われる
+  - 「何も返さない」というのを明示的に示す
+  - 逆に return を使って要素を返す指定をするとエラーになる
+
+##### 関数宣言
+
+```javascript
+👌 function foo(): void {
+  console.log("hello");
+}
+👌 function foo(): void {
+  console.log("hello");
+  return
+}
+👌 function foo(): void {
+  console.log("hello");
+  return undefined;
+}
+
+👎 function foo(): void {
+  console.log("hello");
+  return 0
+}
+```
+
+##### アロー関数（関数式）
+
+```javascript
+const foo = (): void => {
+  console.log("hello");
+};
+
+const foo: () => void = () => {
+  console.log("hello");
+};
+```
+
+##### 型を外出しする
+
+```javascript
+type Foo = () => void;
+
+const foo: Foo = () => {
+  console.log("hello");
+};
+```
+
+### Never
+  - 発生し得ない値の型に対して Never 型は付与する
+
+```javascript
+const foo = (bar: "a" | "b") => {
+  switch (bar) {
+    case "a":
+      return;
+    case "b":
+      return;
+    default:
+      bar; /** 絶対に到達しない場所、ここが Never となる */
+      break;
+  }
+};
 ```

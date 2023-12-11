@@ -8,5 +8,14 @@ export default function Home() {
   );
 }
 
-const foo = "foo" as const; /** constアサーションでstring Literal type のまま型を維持できる*/
-let bar = foo;
+const foo = (bar: "a" | "b") => {
+  switch (bar) {
+    case "a":
+      return;
+    case "b":
+      return;
+    default:
+      bar /** 絶対に到達しない場所、ここが Never となる */
+      break;
+  }
+};
