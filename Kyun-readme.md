@@ -462,3 +462,115 @@ let obj3: Record<string, unknown> = {
   b: "foo",
 };
 ```
+
+## Intersection Types（交差型）
+
+### Intersection Types とは
+
+- 複数の型を 1 つにまとめることができるもの
+- 型に名前がつけられる
+
+#### どのような場面で使うのか
+
+- 型が長すぎる場合
+- コードの見通しを良くする
+- プリミティブ型は合体できるが、`never型`となる
+
+```javascript
+type Foo = {
+  a: number,
+  b: string,
+};
+
+type Bar = {
+  c: boolean,
+};
+
+type FooBar = Foo `&` Bar;  /** &(アンパサンド)を使って、typeを合体させる */
+
+const Test: FooBar = { /** typeを合体させると、プロパティも合体させた評価になる */
+  a: 1,
+  b: "",
+  c: true,
+};
+```
+
+## Union Types（共用型、合併型）
+
+### Union Types とは
+
+- 複数の型があった場合、どれか 1 つの型が成立すれば OK
+- 両方の型を満たしていても、OK
+- プリミティブ型でもかなり使われる
+- Literal types でもよく使われる
+
+```javascript
+type Foo = {
+  a: number,
+  b: string,
+};
+
+type Bar = {
+  c: boolean,
+};
+
+type FooBar = Foo | Bar; /** ｜（パイプ）を使って、typeを合体させる */
+
+const test: FooBar = {
+  /** typeを合体させると、プロパティも合体させた評価になる */
+  a: 1,
+  b: "",
+  c: true,
+};
+```
+
+#### 応用編
+
+```javascript
+type Foo = {
+  a: number,
+  b: string,
+};
+
+type Bar = {
+  a: string,
+  c: boolean,
+};
+
+type FooBar = Foo | Bar;
+
+const test: FooBar = {
+  /** aは、Number型でもstring型でも、OK */
+  a: "",
+  b: "",
+  c: true,
+};
+```
+
+#### 型の絞り込みが必要な場合
+
+```javascript
+type Foo = {
+  a: number,
+  b: string,
+};
+
+type Bar = {
+  a: string,
+  c: boolean,
+};
+
+type FooBar = Foo | Bar;
+
+const test: FooBar = {
+  /** aは、Number型でもstring型でも、OK */
+  a: "",
+  b: "",
+  c: true,
+};
+
+if ("b" in test) {
+  // test というオブジェクトのなかに "b"というプロパティはありますか？という意味
+  test.a.toFixed();
+}
+```

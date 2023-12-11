@@ -1,16 +1,28 @@
 import { NextPage } from "next";
 
-let obj3: Record<string, unknown> = {
-  // string[0]は、キー部分
-  a: 1,
-  b: "foo",
+type Foo = {
+  a: number;
+  b: string;
 };
 
-let obj4: { [key: string]: unknown; foo: string } = {
-  a: 1,
-  s: "foo",
-  foo: "foo",
+type Bar = {
+  a: string;
+  c: boolean;
 };
+
+type FooBar = Foo | Bar;
+
+const test: FooBar = {
+  /** aは、Number型でもstring型でも、OK */
+  a: "",
+  b: "",
+  c: true,
+};
+
+//
+if ("b" in test) {
+  test.a.toFixed();
+}
 
 const Home: NextPage = () => {
   return (
