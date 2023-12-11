@@ -103,51 +103,53 @@ function double(x: number): number | undefined {
 
 ### 真偽値（Boolean）
 
-  ```javascript
-  const foo: boolean = true;
-  const baz: boolean = false;
-  ```
+```javascript
+const foo: boolean = true;
+const baz: boolean = false;
+```
 
 ### 文字列（String）
 
-  ```javascript
-  const foo: string = "kyun";
-  const bar: string = "kyun";
-  const baz: string = `kyun`;
-  ```
+```javascript
+const foo: string = "kyun";
+const bar: string = "kyun";
+const baz: string = `kyun`;
+```
 
 ### 数値（Number）
 
-  ```javascript
-  const foo: number = 111;
-  const baz: number = 0.1;
-  ```
+```javascript
+const foo: number = 111;
+const baz: number = 0.1;
+```
 
 ### null
+
     - 現在利用できない状態を表す型
     - json ファイルで使うことが可能
     - API で json を返すときには、null が使われる
     - TypeScript の開発チームは、null を使わないと明言
 
-  ```javascript
-  const foo: null = null;
-  ```
+```javascript
+const foo: null = null;
+```
 
 ### undefined
+
     - 初期化されていない状態の型
     - json ファイルで使うことは不可能
     - TypeScript の開発チームは、undefined を使うと明言
 
-  ```javascript
-  const foo: undefined = undefined;
-  ```
+```javascript
+const foo: undefined = undefined;
+```
 
-  - BigInt（あまり使われない）
-  - シンボル（Symbol）（あまり使われない）
+- BigInt（あまり使われない）
+- シンボル（Symbol）（あまり使われない）
 
-  ```
+```
 
-  ```
+```
 
 ### オブジェクト
 
@@ -276,54 +278,54 @@ const kyun: (number | string)[] = [1, "2", 3];
 
 ### Tuple
 
-  - 一つ一つの要素に対して型をつけることができる
-  - 要素の順番が決まっている
-  - 要素の数が決まっている
+- 一つ一つの要素に対して型をつけることができる
+- 要素の順番が決まっている
+- 要素の数が決まっている
 
-  ```javascript
-  const foo: [string, number] = ["foo", 1];
-  ```
+```javascript
+const foo: [string, number] = ["foo", 1];
+```
 
-  #### メリット
+#### メリット
 
-  - 要素が持っているメソッドを補完してくれる
+- 要素が持っているメソッドを補完してくれる
 
 ### Any
 
-  - 型が不明なときに、型チェックを無効にして、コンパイルを無理やり通す時に使われる
-  - 基本的に多用して良いものではない
-  - js から Ts に型付けする場合、全てを変更できないため、一度 any 型にして順を追って型付けしていく
+- 型が不明なときに、型チェックを無効にして、コンパイルを無理やり通す時に使われる
+- 基本的に多用して良いものではない
+- js から Ts に型付けする場合、全てを変更できないため、一度 any 型にして順を追って型付けしていく
 
-  ```javascript
-  👌 const foo: any = true;
-  👌 const bar: any = 123;
-  👌 const baz: any = "kyun";
-  ```
+```javascript
+👌 const foo: any = true;
+👌 const bar: any = 123;
+👌 const baz: any = "kyun";
+```
 
 ### Unknown
 
-  - 型が不明な時に使う点は、any と似ている
-  - any より安全にしたい場合に使われる
-  - 利用するときに型がしっかりと評価されるため安全
+- 型が不明な時に使う点は、any と似ている
+- any より安全にしたい場合に使われる
+- 利用するときに型がしっかりと評価されるため安全
 
-  ```javascript
-  👌 const foo: unknown = true;
-  👌 const bar: unknown = 123;
-  👌 const baz: unknown = "kyun";
-  ```
+```javascript
+👌 const foo: unknown = true;
+👌 const bar: unknown = 123;
+👌 const baz: unknown = "kyun";
+```
 
-  ```javascript
-  👌 const baz: unknown = "kyun";
-  if (typeof baz === "string") {
-    baz.substr(2);
-  }
-  ```
+```javascript
+👌 const baz: unknown = "kyun";
+if (typeof baz === "string") {
+  baz.substr(2);
+}
+```
 
 ### Void
 
-  - 関数の返り値がない場合によく使われる
-  - 「何も返さない」というのを明示的に示す
-  - 逆に return を使って要素を返す指定をするとエラーになる
+- 関数の返り値がない場合によく使われる
+- 「何も返さない」というのを明示的に示す
+- 逆に return を使って要素を返す指定をするとエラーになる
 
 ##### 関数宣言
 
@@ -369,7 +371,8 @@ const foo: Foo = () => {
 ```
 
 ### Never
-  - 発生し得ない値の型に対して Never 型は付与する
+
+- 発生し得ない値の型に対して Never 型は付与する
 
 ```javascript
 const foo = (bar: "a" | "b") => {
@@ -382,5 +385,80 @@ const foo = (bar: "a" | "b") => {
       bar; /** 絶対に到達しない場所、ここが Never となる */
       break;
   }
+};
+```
+
+## オブジェクト（7）
+
+- 非プリミティブ型のオブジェクト
+- 辞書型としてのオブジェクト
+
+```javascript
+👎 let obj1: {} = {};
+   /** 辞書型のオブジェクトを指していない nullとundefined以外は全て受け取れる */
+
+👎 let obj2: object = {};
+   /** 辞書型のオブジェクトとしては適していない */
+
+👌 let obj3: Record<string, unknown> = {};
+
+Record: 標準ライブラリ
+
+- 特定のプロパティが存在する場合に記述しやすい
+
+👌 let obj4: { [key: string]: unknown; foo: string } = { /** 型部分を「Index signature」と呼ぶ */
+  a: 1,
+  s: "foo",
+  foo: "foo",
+};
+
+- 特定のプロパティがオプショナルである場合を表現する時も使いやすい
+
+👌 let obj4: { a: number; b: string; foo?:string} = {
+  a: 1,
+  s: "foo",
+  // foo: "foo",
+
+  /** 無くても オプショナルなら型を受け取らない可能性がある
+  認識されるため、エラーがでない */
+};
+
+  - オブジェクトのValueがネストした場合にRecordも扱いやすい
+
+👌 let obj4:  { [key: string]: {foo: unknown} } = {
+  a: {
+    foo: 1,
+  },
+};
+
+```
+
+##### 空オブジェクトを定義する プロパティを追加
+
+```javascript
+let obj3: Record<string, unknown> = {};
+let obj4: { [key: string]: unknown } = {};
+
+obj3.foo = "bar";
+obj4.foo = "baz";
+```
+
+##### 空オブジェクトを定義する プロパティを追加したくない場合
+
+```javascript
+let obj3: Record<string, never> = {};
+let obj4: { [key: string]: never } = {};
+
+obj3.foo = "bar";
+obj4.foo = "baz";
+```
+
+##### プロパティがある状態
+
+```javascript
+let obj3: Record<string, unknown> = {
+  // string[0]は、キー部分
+  a: 1,
+  b: "foo",
 };
 ```

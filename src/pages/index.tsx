@@ -1,21 +1,23 @@
-export default function Home() {
+import { NextPage } from "next";
+
+let obj3: Record<string, unknown> = {
+  // string[0]は、キー部分
+  a: 1,
+  b: "foo",
+};
+
+let obj4: { [key: string]: unknown; foo: string } = {
+  a: 1,
+  s: "foo",
+  foo: "foo",
+};
+
+const Home: NextPage = () => {
   return (
     <>
-      <div className="">
-        <Component />
-      </div>
+      <div className="">test</div>
     </>
   );
-}
-
-const foo = (bar: "a" | "b") => {
-  switch (bar) {
-    case "a":
-      return;
-    case "b":
-      return;
-    default:
-      bar /** 絶対に到達しない場所、ここが Never となる */
-      break;
-  }
 };
+
+export default Home;
