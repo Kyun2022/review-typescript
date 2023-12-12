@@ -1,8 +1,8 @@
 # TypeScript 講座
 
-## Setting
+## #1 Setting
 
-#### ファイル作成・設定(1.2)
+#### ファイル作成・設定
 
 1. git に新規でリポジトリを作成する
 2. [Quick setup](/images/gitclone.png)で HTTPS に変更した際に出力される URL をコピーする
@@ -18,13 +18,13 @@
 12. `index.js`がコンパイルされる
 13. コンパイルする際、型違いが発見されるとエラーになる
 
-## Create-Next-app(2)
+## #2 Create-Next-app
 
 ファイル一新させる
 
 - `yarn create next-app --typescript`をターミナルへ入力
 
-## 型推論・型アノテーション・型アサーション(3)
+## #3 型推論・型アノテーション・型アサーション
 
 #### 型推論（type Inference）
 
@@ -73,7 +73,7 @@ function double(x: number): number | undefined {
     let foo = {} as { bar: number };
     ```
 
-## 動的型付け・静的型付け、プリミティブ型・オブジェクト・null・undefined(4)
+## #4 動的型付け・静的型付け、プリミティブ型・オブジェクト・null・undefined
 
 #### 動的型付け言語
 
@@ -159,7 +159,7 @@ const foo: undefined = undefined;
   - 関数
   - 配列
 
-## Literal Types の使い方や使い道、Widening の概念(5)
+## #5 Literal Types の使い方や使い道、Widening の概念
 
 ### Literal Types
 
@@ -260,7 +260,7 @@ const foo = "foo" as const; /** constアサーションで、string Literal type
 let bar = foo;
 ```
 
-## Array, Tuple, Any, Unknown, Void, Never(6)
+## #6 Array, Tuple, Any, Unknown, Void, Never
 
 ### Array
 
@@ -388,7 +388,7 @@ const foo = (bar: "a" | "b") => {
 };
 ```
 
-## オブジェクト（7）
+## #7 オブジェクト
 
 - 非プリミティブ型のオブジェクト
 - 辞書型としてのオブジェクト
@@ -463,14 +463,16 @@ let obj3: Record<string, unknown> = {
 };
 ```
 
-## Intersection Types（交差型）（8）
+## #8 Intersection Types（交差型）と Union Types（合併型）
 
-### Intersection Types とは
+### Intersection Types（交差型）
+
+#### Intersection Types とは
 
 - 複数の型を 1 つにまとめることができるもの
 - 型に名前がつけられる
 
-#### どのような場面で使うのか
+##### どのような場面で使うのか
 
 - 型が長すぎる場合
 - コードの見通しを良くする
@@ -495,9 +497,9 @@ const Test: FooBar = { /** typeを合体させると、プロパティも合体�
 };
 ```
 
-## Union Types（共用型、合併型）（8）
+### Union Types（共用型、合併型）
 
-### Union Types とは
+#### Union Types とは
 
 - 複数の型があった場合、どれか 1 つの型が成立すれば OK
 - 両方の型を満たしていても、OK
@@ -575,7 +577,7 @@ if ("b" in test) {
 }
 ```
 
-## Interface と Type Alias との違い（9）
+## #9 Interface と Type Alias との違い
 
 ### 宣言できる型に違いがある
 
@@ -647,7 +649,7 @@ const foo: Foo = {
 };
 ```
 
-### 継承 （型の拡張）方法が違う
+#### 継承 （型の拡張）方法が違う
 
 ##### Interface の記述方法
 
@@ -743,6 +745,75 @@ const foo: Foo = {
 #### type alias
 
 - プリミティブ型や配列を使うことができる
-- open-endedに準拠していない方が勝手にマージされなくて済む
+- open-ended に準拠していない方が勝手にマージされなくて済む
 - 必要性から考えても、プロパティのオーバーライドを考えなくてもいい
-- Mapped typesたいぷすが使える
+- Mapped types たいぷすが使える
+
+## #11 型宣言ファイル（d.ts） と外部パッケージ利用について
+
+#### d.ts ファイルの所在( Next.js の場合 )
+
+> node_modules > next > types > index.d.ts
+
+#### d.ts ファイルとは
+
+- 型定義ファイルのこと
+
+#### 型定義ファイルとは
+
+- ライブラリを利用する側に型を通達するためのファイル
+
+## #12 外部パッケージが TypeScript 製でない場合の型の利用
+
+#### React 版 d.ts ファイルの所在
+
+> node_modules > @type > react > index.d.ts
+
+##### - React は、TypeScript 製ではない
+
+##### - @type の配下にあるものは、外部パッケージ自体が型定義ファイルを内容していないときに@type を使って型を外部から提供する
+
+##### - DefinitelyTyped( DefinitelyTyped / types )は、型定義ファイルが格納されている外部パッケージ
+
+##### - React は、DefinitelyTyped で配信されている外部パッケージをもとに型定義を読み込んでいる
+
+#### インストール方法（読み込み方法）
+
+> 例 @types/react
+
+### TypeScript で開発する際のパッケージの選びかた
+
+- GitHub のスター数
+- 最新のコミット
+- ==型がちゃんと使えるかどうか==
+
+  ##### ①typescript 製であること
+
+  - GitHub の language を見て、typescript の比率を確認する
+  - 型定義ファイルを機械的に自動生成できるから、間違いはない
+
+  ##### ② 例）Day.js は、javaScript で 100%作成されているが、リポジトリ内に内包されている
+
+  - index.d.ts が劣っている可能性がある
+  - index.d.ts は人間が記述しているので、間違う可能性がある
+
+  - メンテナーが携わっている可能性が高いため、パッケージと型定義のズレがあまり考えにくい
+
+  ##### ③Definitely Typed に型定義があるもの
+
+  - メンテナーが携わっている可能性が低いため、パッケージと型定義のズレが出てくることが考えられる
+
+  ##### 👎 Javascript で作成されているパッケージで、型定義ファイルが DefinitelyTyped にもない
+
+  - ==そのパッケージは避けなければならない==
+  - 型が any になってしまう
+
+### ts ファイルをコンパイル
+
+> npx tsc index.ts
+
+- index.js が生成される
+
+> npx tsc index.ts -d
+
+- index.js と index.d.ts と型定義ファイルも同時に生成される
