@@ -900,3 +900,135 @@ function test(x: key){ /** type key = "foo" | 111 */
 
 test("foo")
 ```
+
+## ダウンキャストとアップキャスト
+
+- どちらも==型を変える行為==のこと
+
+#### ダウンキャスト
+
+- 型推論で導かれた型が抽象的すぎる場合、プログラマー側で型を詳しくすること
+- 抽象度の高い型をより詳しい型にしていくこと
+
+#### アップキャスト
+
+- 抽象的にすること
+- ==あまり使うべきではない==
+- 型を自分の力だけでは解決できない場合に使う
+
+```javascript
+export const color = "red"; /** color: "red" */
+
+const theme = {
+  color: "red" /** color: string */,
+};
+```
+
+- TypeScript が JavaScript の仕様に基づいてつくられている
+- 仮に string ではなく"red"で推論されたとして、後から変更できてしまうと不都合が起きる
+- オブジェクトの中のプロパティに対しては`Literal Types`で==宣言されることがない仕様==になっている
+
+```javascript
+export const color = "red";
+
+color = "blue";
+
+const theme = {
+  color: "red",
+};
+
+theme.color = "blue";
+```
+
+##### ダウンキャストの例
+
+==string に対して、string でダウンキャストしなければならない==
+
+```javascript
+const theme = {
+  color: "red" as "red", /** color: "red */
+  color: "red" as const, /** color: "red */
+};
+```
+
+###### const でダウンキャストしたものを`const assertion`
+
+- 複数のダウンキャストされたプロパティをまとめた記述
+- readonly が付与される
+- widening を抑止することができる
+- 何かしらの定数ファイルをつくる時によく使われる
+  ( 基本的に`as const`をつける )
+
+```javascript
+const theme = {
+  /** const theme: {
+    readonly color: "red";
+    readonly backgroundColor: "blue";
+}
+{ color: 'red', backgroundColor: 'blue' } */
+
+  color: "red",
+  backgroundColor: "blue",
+} as const;
+
+part1
+export const color = "red" as const;
+let x = color;
+/** let x: "red" */
+
+part2
+function foo () = {
+  return {foo: "foo"} as const
+}
+
+const y = foo();
+
+
+export const PATH = {
+  INDEX: "/",
+  LOGIN: "/login",
+  REGISTER: "/register",
+  PROFILE: "/profile",
+} as const;
+
+PATH.INDEX = "/";
+
+/** const PATH: {
+    readonly INDEX: "/";
+    readonly LOGIN: "/login";
+    readonly REGISTER: "/register";
+    readonly PROFILE: "/profile";
+}
+*/
+```
+
+### Non-null assertion と Double assertion
+
+##### Non-null assertion（使うべきではない、危険！）
+
+```javascript
+export function getFirstError(str?: string) {
+/** undefinedの可能性を、! で無理やり消し去る */
+  return str!.charAt(0);
+}
+
+改善策
+export function getFirstError(str?: string) {
+  if (!str) { /** 型ガード */
+    return;
+  }
+  return str.charAt(0);
+}
+```
+
+##### Double assertion (あまり使うべきではない、危険！)
+
+- 1 度目の`as`では`アップキャスト`、2 度目の`as`では`ダウンキャスト`している
+- 外部のパッケージの型が間違っている場合に==型を書き換えるために使う==
+
+```javascript
+export function getFirstError(str: number) {
+  return (str as unknown as string).charAt(0);
+  /** strを一旦、unknownに変更してから、stringに変更となる */
+}
+```
