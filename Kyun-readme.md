@@ -463,7 +463,7 @@ let obj3: Record<string, unknown> = {
 };
 ```
 
-## Intersection Types（交差型）
+## Intersection Types（交差型）（8）
 
 ### Intersection Types とは
 
@@ -495,7 +495,7 @@ const Test: FooBar = { /** typeを合体させると、プロパティも合体�
 };
 ```
 
-## Union Types（共用型、合併型）
+## Union Types（共用型、合併型）（8）
 
 ### Union Types とは
 
@@ -574,3 +574,175 @@ if ("b" in test) {
   test.a.toFixed();
 }
 ```
+
+## Interface と Type Alias との違い（9）
+
+### 宣言できる型に違いがある
+
+- interface の場合
+  - 宣言できるものが、オブジェクト
+  - string 型、number 型などは、エラーになる
+- type alias の場合
+  - なんでも表現できる
+
+### Open ended に準拠しているか
+
+- Open ended とは、同じ宣言名があった場合、自動的にマージされる性質のこと
+
+##### interface は準拠していて、マージされる
+
+```javascript
+interface Foo {
+  a: number;
+}
+interface Foo {
+  b: number;
+}
+
+const foo: Foo = {
+  /** マージされている */
+  a: 1,
+  b: 1,
+};
+```
+
+##### type alias は準拠していないので、マージされない
+
+```javascript
+/** エラーが出る */
+type Foo {
+  a: number;
+}
+type Foo {
+  b: number;
+}
+
+const foo: Foo = {
+  a: 1,
+  b: 1,
+};
+```
+
+### Type Alias の記述方法
+
+```javascript
+type Foo = {
+  a: number,
+};
+
+const foo: Foo = {
+  a: 1,
+};
+```
+
+### Interface の記述方法
+
+```javascript
+interface Foo {
+  a: number;
+}
+
+const foo: Foo = {
+  a: 1,
+};
+```
+
+### 継承 （型の拡張）方法が違う
+
+##### Interface の記述方法
+
+```javascript
+interface Foo {
+  a: number;
+}
+interface Bar extends Foo {
+  b: number;
+}
+
+const foo: Bar = {
+  a: 1,
+  b: 1,
+};
+```
+
+##### Type Alias は継承ができない
+
+```javascript
+type Foo = {
+  a: number,
+};
+type Bar = Foo & {
+  /** intersection typeで、＆を使って追加することしかできない！！ */
+  b: number,
+};
+
+const foo: Bar = {
+  a: 1,
+  b: 1,
+};
+```
+
+### プロパティをオーバーライドしたときの違い
+
+- 予期せぬ値を事前に防ぐことができる
+
+```javascript
+type Foo = {
+  a: number,
+};
+type Bar = Foo & {
+  a: string,
+};
+
+const foo: Bar = {
+  /** プロパティにエラーが出る   */
+
+  a: 1,
+};
+```
+
+```javascript
+interface Foo {
+  a: number;
+}
+interface Bar extends Foo {
+  /** Barにエラーが出る */
+  a: string;
+}
+
+const foo: Bar = {
+  a: 1,
+};
+```
+
+### Mapped Types が使えるかどうか
+
+#### Mapped Types とは、他の型をもとに新しい型を作るための方法
+
+- Interface は、使えない
+- Types Alias は、使える
+
+```javascript
+type Animals = "dog" | "cat";
+
+type Foo = {
+  [key in Animals]: number;
+
+  // dog: number;
+  // cat: number;
+};
+
+const foo: Foo = {
+  dog: 1,
+  cat: 2,
+};
+```
+
+### どっちを使えばいいか
+
+#### type alias
+
+- プリミティブ型や配列を使うことができる
+- open-endedに準拠していない方が勝手にマージされなくて済む
+- 必要性から考えても、プロパティのオーバーライドを考えなくてもいい
+- Mapped typesたいぷすが使える
