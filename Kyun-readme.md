@@ -128,7 +128,7 @@ const baz: number = 0.1;
     - 現在利用できない状態を表す型
     - json ファイルで使うことが可能
     - API で json を返すときには、null が使われる
-    - TypeScript の開発チームは、null を使わないと明言
+    - TypeScript の開発チームは、nullを使わないと明言
 
 ```javascript
 const foo: null = null;
@@ -137,8 +137,8 @@ const foo: null = null;
 ### undefined
 
     - 初期化されていない状態の型
-    - json ファイルで使うことは不可能
-    - TypeScript の開発チームは、undefined を使うと明言
+    - `json ファイル`で使うことは不可能
+    - TypeScript の開発チームは、undefinedを使うと明言
 
 ```javascript
 const foo: undefined = undefined;
@@ -163,7 +163,7 @@ const foo: undefined = undefined;
 
 ### Literal Types
 
-- Boolean, String, Number 型のプリミティブ型を細分化したもの
+- `Boolean, String, Number 型`の`プリミティブ型`を細分化したもの
 - コードを記述するときの補完に役立つ
 - 予期せぬ値を防ぐ
 - タイポも防ぐ
@@ -241,8 +241,8 @@ const Component = (props: { foo?: true }) => {
 ### Widening（widening Literal type）
 
 - 型が拡張されてしまう性質 = widening
-- Literal type だけではない！
-- 以下の 3 つの対策で、string Literal type を拡張されずに型を維持できる
+- `Literal type` だけではない！
+- 以下の 3 つの対策で、`string Literal type` を拡張されずに型を維持できる
 
 ```javascript
 const foo = "foo"; /** string Literal type */
@@ -294,7 +294,7 @@ const foo: [string, number] = ["foo", 1];
 
 - 型が不明なときに、型チェックを無効にして、コンパイルを無理やり通す時に使われる
 - 基本的に多用して良いものではない
-- js から Ts に型付けする場合、全てを変更できないため、一度 any 型にして順を追って型付けしていく
+- js から Ts に型付けする場合、全てを変更できないため、一度 `any 型`にして順を追って型付けしていく
 
 ```javascript
 👌 const foo: any = true;
@@ -304,8 +304,8 @@ const foo: [string, number] = ["foo", 1];
 
 ### Unknown
 
-- 型が不明な時に使う点は、any と似ている
-- any より安全にしたい場合に使われる
+- `型が不明な時に使う点は、any` と似ている
+- `any` より安全にしたい場合に使われる
 - 利用するときに型がしっかりと評価されるため安全
 
 ```javascript
@@ -372,7 +372,7 @@ const foo: Foo = () => {
 
 ### Never
 
-- 発生し得ない値の型に対して Never 型は付与する
+- 発生し得ない値の型に対して` Never 型`は付与する
 
 ```javascript
 const foo = (bar: "a" | "b") => {
@@ -476,7 +476,7 @@ let obj3: Record<string, unknown> = {
 
 - 型が長すぎる場合
 - コードの見通しを良くする
-- プリミティブ型は合体できるが、`never型`となる
+- `プリミティブ型`は合体できるが、`never型`となる
 
 ```javascript
 type Foo = {
@@ -503,8 +503,8 @@ const Test: FooBar = { /** typeを合体させると、プロパティも合体�
 
 - 複数の型があった場合、どれか 1 つの型が成立すれば OK
 - 両方の型を満たしていても、OK
-- プリミティブ型でもかなり使われる
-- Literal types でもよく使われる
+- `プリミティブ型`でもかなり使われる
+- `Literal types` でもよく使われる
 
 ```javascript
 type Foo = {
@@ -581,10 +581,10 @@ if ("b" in test) {
 
 ### 宣言できる型に違いがある
 
-- interface の場合
+- `interface` の場合
   - 宣言できるものが、オブジェクト
-  - string 型、number 型などは、エラーになる
-- type alias の場合
+  - `string 型`、`number 型`などは、エラーになる
+- `type alias` の場合
   - なんでも表現できる
 
 ### Open ended に準拠しているか
@@ -721,8 +721,8 @@ const foo: Bar = {
 
 #### Mapped Types とは、他の型をもとに新しい型を作るための方法
 
-- Interface は、使えない
-- Types Alias は、使える
+- `Interface` は、使えない
+- `Types Alias` は、使える
 
 ```javascript
 type Animals = "dog" | "cat";
@@ -745,9 +745,9 @@ const foo: Foo = {
 #### type alias
 
 - プリミティブ型や配列を使うことができる
-- open-ended に準拠していない方が勝手にマージされなくて済む
+- `open-ended` に準拠していない方が勝手にマージされなくて済む
 - 必要性から考えても、プロパティのオーバーライドを考えなくてもいい
-- Mapped types たいぷすが使える
+- `Mapped types` が使える
 
 ## #11 型宣言ファイル（d.ts） と外部パッケージ利用について
 
@@ -789,13 +789,13 @@ const foo: Foo = {
 
   ##### ①typescript 製であること
 
-  - GitHub の language を見て、typescript の比率を確認する
+  - GitHub の `language` を見て、typescript の比率を確認する
   - 型定義ファイルを機械的に自動生成できるから、間違いはない
 
   ##### ② 例）Day.js は、javaScript で 100%作成されているが、リポジトリ内に内包されている
 
-  - index.d.ts が劣っている可能性がある
-  - index.d.ts は人間が記述しているので、間違う可能性がある
+  - `index.d.ts `が劣っている可能性がある
+  - `index.d.ts `は人間が記述しているので、間違う可能性がある
 
   - メンテナーが携わっている可能性が高いため、パッケージと型定義のズレがあまり考えにくい
 
@@ -818,9 +818,85 @@ const foo: Foo = {
 
 - index.js と index.d.ts と型定義ファイルも同時に生成される
 
-## typeOf と keyOf
+## typeof と keyof
 
 - どちらも==型クエリー==と呼ばれるもの
-- 型クエリーとは、指定したものから型をコピー（キャプチャ）するためのもの
-   - 自分で宣言した変数
-   - 外部パッケージからインポートしてきた関数
+- `型クエリー`とは、指定したものから型をコピー（キャプチャ）するためのもの
+  - 自分で宣言した変数
+  - 外部パッケージからインポートしてきた関数
+
+#### typeof
+
+- ==型定義以外==のものに使う
+- 型推論で導かれた型定義もキャプチャすることができる
+- `Literal Types`を設定しても、==型アノテーションを指定した型==が優先されてしまう
+
+```javascript
+export const foo: string = "123";
+
+type Foo = typeof foo;
+```
+
+##### UseCase
+
+```javascript
+export const obj1 = {
+  foo: "foo",
+  bar: "bar",
+};
+
+const obj2: typeof obj1 = {
+  foo: "aaaa",
+  bar: "bbbb",
+};
+```
+
+```javascript
+export function double(x: number | string) {
+  if (typeof x === "string") {
+    return Number(x) * 2; /** if文で、xはstring型と絞り込んでいる */
+  }
+  /** それ以外は、number型になる */
+  return x * 2;
+}
+
+console.log(double(3));
+```
+
+#### keyof
+
+- ==型定義に対して==使う`型クエリー`
+- `Literal Types`のプロパティ名を`Literal Types`として一覧で取得できるもの
+
+```javascript
+export type obj = {
+  foo: string;
+  bar: number;
+};
+
+type key = keyof obj;
+
+const key: key = "foo";
+```
+
+##### typeof と keyof を組み合わせることができる
+
+- `keyof`はプロパティ名が`string`の場合に限るわけではない
+
+```javascript
+export const Obj = {
+  foo: "foo",
+  111: "bar",
+};
+
+// type Obj = typeof Obj;
+// type key = keyof Obj;
+
+type key = keyof typeof Obj;
+
+function test(x: key){ /** type key = "foo" | 111 */
+  return;
+}
+
+test("foo")
+```
