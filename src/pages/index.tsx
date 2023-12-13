@@ -1,7 +1,8 @@
 import { NextPage } from "next";
 import { TwitterCard } from "./components/TwitterCard";
 
-const Home: NextPage = () => {
+const Home: NextPage<{ foo: number }> = (props) => {
+  props.foo
   return (
     <>
       <TwitterCard

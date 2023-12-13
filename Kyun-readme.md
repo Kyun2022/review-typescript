@@ -719,7 +719,7 @@ const foo: Bar = {
 };
 ```
 
-### プロパティをオーバーライドしたときの違い
+- ### プロパティをオーバーライドしたときの違い
 
 - 予期せぬ値を事前に防ぐことができる
 
@@ -1355,4 +1355,410 @@ export const foo = (value: UserA | UserB | UserC) => {
     }
   }
 };
+```
+
+## #17 ユーザー定義の型ガード
+
+#### ユーザー定義の Type Guard がなぜ必要か
+
+- 関数の返り値が true の場合、`is 〇〇〇`で指定した型が適用される
+
+```javascript
+ex1
+type UserA = { name: string; lang: "ja" };
+type UserB = { name: string; lang: "en" };
+
+const isUserA = (user: UserA | UserB): user is UserA => {
+  _/** user is UserA で、型はUserAが適用される */
+  return user.lang === "ja";
+  /** value: UserA */
+};
+
+export const foo = (value: UserA | UserB) => {
+  if (value.lang === "ja") {
+    return value;
+  }
+  return value;
+};
+
+ex2
+type UserA = { name: string; lang: "ja" };
+type UserB = { name: string; lang: "en" };
+
+const isUserA = (user: UserA | UserB): user is UserA => {
+  return user.lang === "ja";
+};
+
+export const foo = (value: any) => {
+  if (isUserA(value)) {
+    return value; // value: UserA
+  }
+  return value; // value: any
+};
+```
+
+#### Use Case
+
+- 非同期処理
+  - 非同期処理で得たデータは、型がついていないことが多い
+- filter 関数
+  - Typescript がまだ未完成
+  - 型まで絞り込むことができない
+
+```javascript
+ex1:非同期処理でのtype guardの指定方法
+
+const isUserA = (user: UserA | UserB): user is UserA => {
+  return user.lang === "ja";
+};
+
+export const foo = async () => {
+  const res = await fetch("");
+  const json = await res.json();
+  if (isUserA(json)) {
+    return json.lang;
+  }
+};
+
+ex2:filter関数だけでは型を絞り込めない
+const users: (UserA | UserB)[] = [
+  {
+    name: "きゅん",
+    lang: "ja",
+  },
+  {
+    name: "たろう",
+    lang: "ja",
+  },
+  {
+    name: "レン",
+    lang: "en",
+  },
+];
+
+const users: (UserA | UserB)[] = [
+  {
+    name: "きゅん",
+    lang: "ja",
+  },
+  {
+    name: "たろう",
+    lang: "ja",
+  },
+  {
+    name: "レン",
+    lang: "en",
+  },
+];
+
+👎 const japanese = users.filter((user) => user.lang === "ja");
+/**
+ * const japanese: (UserA | UserB)[]
+[ { name: 'きゅん', lang: 'ja' }, { name: 'たろう', lang: 'ja' } ]
+ */
+👌 const japanese1 = users.filter(isUserA);
+/**
+ * const japanese1: UserA[]
+[ { name: 'きゅん', lang: 'ja' }, { name: 'たろう', lang: 'ja' } ]
+ */
+
+```
+
+## #18 Generics の基礎（重要）
+
+- 外部パッケージは`Generics`を前提に作られていることが多い
+- 外部パッケージの`メソッド`に型をつけることができない
+
+#### Generics とは
+
+- 型の決定を遅延できるもの
+
+##### 由来
+
+- T → Type の ==T==
+- K → Key の ==K==
+- U → Unknown の ==U==
+- E → Element の ==E==
+
+```javascript
+ex1: 構文;
+type Foo<T> = {
+  value: T, // 構文
+};
+
+// 型の定義を後から指定することができる
+const foo1: Foo<string> = {
+  value: "",
+};
+
+const foo2: Foo<boolean> = {
+  value: true,
+};
+
+const foo3: Foo<number> = {
+  value: 47,
+};
+const foo4: Foo<number[]> = {
+  value: [1, 2, 3, 4, 5],
+};
+```
+
+```javascript
+type User<T> = {
+  name: string,
+  state: T,
+};
+0;
+
+/** ここではじめて型の決定が行われている */
+type Japanese = User<"東京都" | "大阪府">;
+type American = User<"CA" | "NY">;
+
+const user1: Japanese = {
+  name: "田中",
+  state: "大阪府",
+};
+
+const user2: American = {
+  name: "Nancy",
+  state: "CA",
+};
+```
+
+#### Generics の初期値
+
+```javascript
+ex1: Normal;
+type Foo<T> = {
+  value: T,
+};
+
+const foo1: Foo<string> = {
+  value: "",
+};
+
+const foo2: Foo<number> = {
+  value: 111,
+};
+
+ex2: Better;
+type Foo<T = string> = {
+  value: T,
+};
+
+const foo1: Foo = {
+  // foo1にstringが付与されている
+  value: "",
+};
+
+const foo2: Foo<number> = {
+  value: 111,
+};
+```
+
+#### extends を使った型の制約
+
+- `Generics` の型引数に制約を加えたい時に `extends` を使う
+- `extends`による型の制約が使われる
+
+```javascript
+type Foo<T extends string> = {
+  value: T;
+};
+
+const foo1: Foo<string> = {
+  value: "",
+};
+
+const foo2: Foo<number> = { // エラー発生
+  value: 111,
+};
+
+const foo2: Foo<"bar"> = {
+  value: "bar",
+};
+
+```
+
+### 初期値と extends は同時に用いることが可能
+
+```javascript
+type Foo<T extends string | number = string> = {
+  value: T;
+};
+
+const foo1: Foo = {
+  value: "",
+};
+```
+
+## #19 関数の Generics
+
+- <>`Generics`の型が決まることで、引数（）内が決定
+
+```javascript
+ex1:基本構文/ 関数宣言
+
+function foo<T>(arg: T) {
+  return { value: arg };
+}
+
+const foo1 = foo<number[]>([1, 2]);
+const foo2 = foo<string[]>(["a", "b"]);
+
+ex2:基本構文/ 関数式・アロー関数
+注: 引数の（）の前に Generics を指定
+
+const foo = <T>(arg: T) => {
+  return { value: arg };
+};
+
+```
+
+#### 暗黙的な型解決
+
+- Generics を指定しなくてもエラーにならない
+- 引数をみて、`型推論`されるため
+
+```javascript
+ex1:
+const foo2 = foo("");
+const foo3 = foo(1);
+const foo4 = foo(false);
+```
+
+- 型引数を使う場合はどんなときか
+
+  - `Nullable`な場合
+    - `Nullable` : `null` になりうる値
+
+```javascript
+ex1:
+const foo2 = (foo < string) | (null > "");
+```
+
+#### extends による制約
+
+- Typescript で開発するにはかなり重要！
+- 引数の型の特定に必要(`unKnown`)
+
+```javascript
+ex1:error
+const foo = <T extends string>(arg: T) => {
+  return { value: arg };
+};
+
+const foo2 = foo<string | null>("");
+/** null型は共用できないため、エラーになる */
+
+ex2:OK
+const foo = <T extends string | number | boolean[]>(arg: T) => {
+  return { value: arg };
+};
+
+const foo2 = foo<string>("");
+const foo3 = foo(1);
+const foo4 = foo([false]);
+```
+
+- 型の絞り込みがないと、==メソッドの補完が出現しない==
+
+```javascript
+const foo = <T extends string | number>(arg: T) => {
+  if (typeof arg === "string") {
+    return { value: arg.toUpperCase() };
+    /** string型のメソッドの補完が出現 */
+  }
+  return { value: arg.toFixed() };
+  /** number型のメソッドの補完が出現 */
+};
+
+```
+
+## #20Generics の型引数が複数あるパターンや Lookup types との併用
+
+### Generics の型引数が複数あるパターン
+
+- `初期値`や `extends` の制約を付け加えることが可能
+
+```javascript
+ex1: 基本構文;
+const foo = <T, K, U>(foo: T, bar: K, baz: U) => {
+  return {};
+};
+
+ex2:初期値、extends
+const foo = <T extends string, K extends number, U = boolean>(
+  foo: T,
+  bar: K,
+  baz: U
+) => {
+  return {};
+};
+```
+
+### Generics と Lookup Types が合わさったパターン
+
+```javascript
+ex1:Lookup types
+type Obj = {
+  a: number,
+};
+
+type Foo = Obj["a"];
+/** a が補完で出現する */
+
+ex2:Genericsと型引数が複数の合わさった場合
+const getProperty = <T, K extends keyof T>(obj: T, key: K) => {
+  return obj[key];
+};
+// Genericsの型引数1番目のTは、第2型引数でも使うことができる
+// Kにはobjのkeyが格納される
+
+ex3:Use Case
+const obj = {
+  foo: 1,
+  bar: 2,
+  baz: 3,
+};
+
+const hoge = getProperty(obj, "baz"); // 3 number
+// bazを入力する前に補完が出現
+
+
+ex4:Use Case
+const setProperty = <T, K extends keyof T>(obj: T, key: K, value: T[K]) => {
+  obj[key] = value;
+};
+
+const obj = {
+  foo: 1,
+  bar: 2,
+  baz: 3,
+};
+
+setProperty(obj, "bar", 100);
+```
+
+### Generics を用いた例
+
+- map 関数が Generics を内包していて、暗黙的な型解決でうまく推論している
+
+```javascript
+ex1: JSのメソッド map関数
+const foo = [1, 2, 3].map((v) => v.toString());
+// const foo: string[]
+```
+
+```javascript
+ex1: 外部パッケージの型（Next.js）
+注: コードジャンプして型を追求する
+const Home: NextPage<{ foo: number }> = (props) => {
+  props.foo
+
+export type NextPage<Props = {}, InitialProps = Props> = NextComponentType<
+  NextPageContext,
+  InitialProps,
+  Props
+>
 ```
