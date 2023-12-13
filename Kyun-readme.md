@@ -37,8 +37,7 @@
 - 開発側が主体となってコードを記述できる（開発者ドリブン）
 
 ```javascript {.line-numbers}
-
-Example
+ex1
 ---------------------------
 let foo: number = 123;
 
@@ -70,6 +69,7 @@ function double(x: number): number | undefined {
     2. 外部ライブラリを使う時に型が用意されていなかったり不十分だったりする場合
 
     ```javascript
+    ex1
     let foo = {} as { bar: number };
     ```
 
@@ -104,6 +104,7 @@ function double(x: number): number | undefined {
 ### 真偽値（Boolean）
 
 ```javascript
+ex1;
 const foo: boolean = true;
 const baz: boolean = false;
 ```
@@ -111,6 +112,7 @@ const baz: boolean = false;
 ### 文字列（String）
 
 ```javascript
+ex1;
 const foo: string = "kyun";
 const bar: string = "kyun";
 const baz: string = `kyun`;
@@ -119,6 +121,7 @@ const baz: string = `kyun`;
 ### 数値（Number）
 
 ```javascript
+ex1;
 const foo: number = 111;
 const baz: number = 0.1;
 ```
@@ -131,6 +134,7 @@ const baz: number = 0.1;
     - TypeScript の開発チームは、nullを使わないと明言
 
 ```javascript
+ex1;
 const foo: null = null;
 ```
 
@@ -141,15 +145,12 @@ const foo: null = null;
     - TypeScript の開発チームは、undefinedを使うと明言
 
 ```javascript
+ex1;
 const foo: undefined = undefined;
 ```
 
 - BigInt（あまり使われない）
 - シンボル（Symbol）（あまり使われない）
-
-```
-
-```
 
 ### オブジェクト
 
@@ -173,6 +174,7 @@ const foo: undefined = undefined;
 - 型指定したもの以外は、エラーになる
 
 ```javascript
+ex1
 👌 const foo: false = false;
 👎 const baz: true = false;
 ```
@@ -182,6 +184,7 @@ const foo: undefined = undefined;
 - タイポしたら、エラーになる
 
 ```javascript
+ex1
 👌 const foo: "foo" = "foo";
 👎 const baz: "baz" = "bar";
 ```
@@ -189,6 +192,7 @@ const foo: undefined = undefined;
 #### Number Literal Types
 
 ```javascript
+ex1
 👌 const foo: 0 = 2;
 👎 const baz: 2 = 2;
 ```
@@ -196,6 +200,7 @@ const foo: undefined = undefined;
 ##### props foo の型が boolean の場合
 
 ```javascript {.line-numbers}
+ex1;
 export default function Home() {
   return (
     <>
@@ -217,6 +222,7 @@ const Component = (props: { foo: boolean }) => {
 ##### props foo の型がオプショナルの場合
 
 ```javascript {.line-numbers}
+ex1;
 export default function Home() {
   return (
     <>
@@ -245,17 +251,20 @@ const Component = (props: { foo?: true }) => {
 - 以下の 3 つの対策で、`string Literal type` を拡張されずに型を維持できる
 
 ```javascript
+ex1;
 const foo = "foo"; /** string Literal type */
 let bar = foo;
 /** barは、string Literal typeではなく、string型に拡張されてしまう */
 ```
 
 ```javascript
+ex2
 const foo = "foo" as "foo"; /** 型アサーションで、string Literal type のまま型を維持できる*/
 let bar = foo;
 ```
 
 ```javascript
+ex3
 const foo = "foo" as const; /** constアサーションで、string Literal type のまま型を維持できる*/
 let bar = foo;
 ```
@@ -265,6 +274,7 @@ let bar = foo;
 ### Array
 
 ```javascript
+ex1
 👌 const foo: number[] = [1, 2, 3];
 👎 const bar: number[] = [1, "2", 3];
 👌 const baz: Array<number> = [1, 2, 3];
@@ -273,6 +283,7 @@ let bar = foo;
 ##### Union type
 
 ```javascript
+ex1;
 const kyun: (number | string)[] = [1, "2", 3];
 ```
 
@@ -283,6 +294,7 @@ const kyun: (number | string)[] = [1, "2", 3];
 - 要素の数が決まっている
 
 ```javascript
+ex1;
 const foo: [string, number] = ["foo", 1];
 ```
 
@@ -297,6 +309,7 @@ const foo: [string, number] = ["foo", 1];
 - js から Ts に型付けする場合、全てを変更できないため、一度 `any 型`にして順を追って型付けしていく
 
 ```javascript
+ex1
 👌 const foo: any = true;
 👌 const bar: any = 123;
 👌 const baz: any = "kyun";
@@ -309,12 +322,14 @@ const foo: [string, number] = ["foo", 1];
 - 利用するときに型がしっかりと評価されるため安全
 
 ```javascript
+ex1
 👌 const foo: unknown = true;
 👌 const bar: unknown = 123;
 👌 const baz: unknown = "kyun";
 ```
 
 ```javascript
+ex2
 👌 const baz: unknown = "kyun";
 if (typeof baz === "string") {
   baz.substr(2);
@@ -330,13 +345,16 @@ if (typeof baz === "string") {
 ##### 関数宣言
 
 ```javascript
+ex1
 👌 function foo(): void {
   console.log("hello");
 }
+
 👌 function foo(): void {
   console.log("hello");
   return
 }
+
 👌 function foo(): void {
   console.log("hello");
   return undefined;
@@ -351,6 +369,7 @@ if (typeof baz === "string") {
 ##### アロー関数（関数式）
 
 ```javascript
+ex1;
 const foo = (): void => {
   console.log("hello");
 };
@@ -363,6 +382,7 @@ const foo: () => void = () => {
 ##### 型を外出しする
 
 ```javascript
+ex1;
 type Foo = () => void;
 
 const foo: Foo = () => {
@@ -375,6 +395,7 @@ const foo: Foo = () => {
 - 発生し得ない値の型に対して` Never 型`は付与する
 
 ```javascript
+ex1;
 const foo = (bar: "a" | "b") => {
   switch (bar) {
     case "a":
@@ -394,6 +415,7 @@ const foo = (bar: "a" | "b") => {
 - 辞書型としてのオブジェクト
 
 ```javascript
+ex1
 👎 let obj1: {} = {};
    /** 辞書型のオブジェクトを指していない nullとundefined以外は全て受け取れる */
 
@@ -436,6 +458,7 @@ Record: 標準ライブラリ
 ##### 空オブジェクトを定義する プロパティを追加
 
 ```javascript
+ex1;
 let obj3: Record<string, unknown> = {};
 let obj4: { [key: string]: unknown } = {};
 
@@ -446,6 +469,7 @@ obj4.foo = "baz";
 ##### 空オブジェクトを定義する プロパティを追加したくない場合
 
 ```javascript
+ex1;
 let obj3: Record<string, never> = {};
 let obj4: { [key: string]: never } = {};
 
@@ -456,6 +480,7 @@ obj4.foo = "baz";
 ##### プロパティがある状態
 
 ```javascript
+ex1;
 let obj3: Record<string, unknown> = {
   // string[0]は、キー部分
   a: 1,
@@ -479,6 +504,7 @@ let obj3: Record<string, unknown> = {
 - `プリミティブ型`は合体できるが、`never型`となる
 
 ```javascript
+ex1
 type Foo = {
   a: number,
   b: string,
@@ -507,6 +533,7 @@ const Test: FooBar = { /** typeを合体させると、プロパティも合体�
 - `Literal types` でもよく使われる
 
 ```javascript
+ex1;
 type Foo = {
   a: number,
   b: string,
@@ -529,6 +556,7 @@ const test: FooBar = {
 #### 応用編
 
 ```javascript
+ex1;
 type Foo = {
   a: number,
   b: string,
@@ -552,6 +580,7 @@ const test: FooBar = {
 #### 型の絞り込みが必要な場合
 
 ```javascript
+ex1;
 type Foo = {
   a: number,
   b: string,
@@ -594,6 +623,7 @@ if ("b" in test) {
 ##### interface は準拠していて、マージされる
 
 ```javascript
+ex1;
 interface Foo {
   a: number;
 }
@@ -611,6 +641,7 @@ const foo: Foo = {
 ##### type alias は準拠していないので、マージされない
 
 ```javascript
+ex1
 /** エラーが出る */
 type Foo {
   a: number;
@@ -628,6 +659,7 @@ const foo: Foo = {
 ### Type Alias の記述方法
 
 ```javascript
+ex1;
 type Foo = {
   a: number,
 };
@@ -640,6 +672,7 @@ const foo: Foo = {
 ### Interface の記述方法
 
 ```javascript
+ex1;
 interface Foo {
   a: number;
 }
@@ -654,6 +687,7 @@ const foo: Foo = {
 ##### Interface の記述方法
 
 ```javascript
+ex1;
 interface Foo {
   a: number;
 }
@@ -670,6 +704,7 @@ const foo: Bar = {
 ##### Type Alias は継承ができない
 
 ```javascript
+ex1;
 type Foo = {
   a: number,
 };
@@ -689,6 +724,7 @@ const foo: Bar = {
 - 予期せぬ値を事前に防ぐことができる
 
 ```javascript
+ex1;
 type Foo = {
   a: number,
 };
@@ -704,6 +740,7 @@ const foo: Bar = {
 ```
 
 ```javascript
+ex2;
 interface Foo {
   a: number;
 }
@@ -725,6 +762,7 @@ const foo: Bar = {
 - `Types Alias` は、使える
 
 ```javascript
+ex1
 type Animals = "dog" | "cat";
 
 type Foo = {
@@ -769,13 +807,13 @@ const foo: Foo = {
 
 > node_modules > @type > react > index.d.ts
 
-##### - React は、TypeScript 製ではない
+- React は、TypeScript 製ではない
 
-##### - @type の配下にあるものは、外部パッケージ自体が型定義ファイルを内容していないときに@type を使って型を外部から提供する
+- @type の配下にあるものは、外部パッケージ自体が型定義ファイルを内容していないときに@type を使って型を外部から提供する
 
-##### - DefinitelyTyped( DefinitelyTyped / types )は、型定義ファイルが格納されている外部パッケージ
+- DefinitelyTyped( DefinitelyTyped / types )は、型定義ファイルが格納されている外部パッケージ
 
-##### - React は、DefinitelyTyped で配信されている外部パッケージをもとに型定義を読み込んでいる
+- React は、DefinitelyTyped で配信されている外部パッケージをもとに型定義を読み込んでいる
 
 #### インストール方法（読み込み方法）
 
@@ -818,7 +856,7 @@ const foo: Foo = {
 
 - index.js と index.d.ts と型定義ファイルも同時に生成される
 
-## typeof と keyof
+## #13 typeof と keyof
 
 - どちらも==型クエリー==と呼ばれるもの
 - `型クエリー`とは、指定したものから型をコピー（キャプチャ）するためのもの
@@ -832,6 +870,7 @@ const foo: Foo = {
 - `Literal Types`を設定しても、==型アノテーションを指定した型==が優先されてしまう
 
 ```javascript
+ex1;
 export const foo: string = "123";
 
 type Foo = typeof foo;
@@ -840,6 +879,7 @@ type Foo = typeof foo;
 ##### UseCase
 
 ```javascript
+ex1;
 export const obj1 = {
   foo: "foo",
   bar: "bar",
@@ -852,6 +892,7 @@ const obj2: typeof obj1 = {
 ```
 
 ```javascript
+ex1;
 export function double(x: number | string) {
   if (typeof x === "string") {
     return Number(x) * 2; /** if文で、xはstring型と絞り込んでいる */
@@ -869,6 +910,7 @@ console.log(double(3));
 - `Literal Types`のプロパティ名を`Literal Types`として一覧で取得できるもの
 
 ```javascript
+ex1
 export type obj = {
   foo: string;
   bar: number;
@@ -884,6 +926,7 @@ const key: key = "foo";
 - `keyof`はプロパティ名が`string`の場合に限るわけではない
 
 ```javascript
+ex1
 export const Obj = {
   foo: "foo",
   111: "bar",
@@ -901,7 +944,7 @@ function test(x: key){ /** type key = "foo" | 111 */
 test("foo")
 ```
 
-## ダウンキャストとアップキャスト
+## #14 ダウンキャストとアップキャスト
 
 - どちらも==型を変える行為==のこと
 
@@ -917,6 +960,7 @@ test("foo")
 - 型を自分の力だけでは解決できない場合に使う
 
 ```javascript
+ex1;
 export const color = "red"; /** color: "red" */
 
 const theme = {
@@ -929,6 +973,7 @@ const theme = {
 - オブジェクトの中のプロパティに対しては`Literal Types`で==宣言されることがない仕様==になっている
 
 ```javascript
+ex1;
 export const color = "red";
 
 color = "blue";
@@ -945,6 +990,7 @@ theme.color = "blue";
 ==string に対して、string でダウンキャストしなければならない==
 
 ```javascript
+ex1
 const theme = {
   color: "red" as "red", /** color: "red */
   color: "red" as const, /** color: "red */
@@ -960,6 +1006,7 @@ const theme = {
   ( 基本的に`as const`をつける )
 
 ```javascript
+ex1
 const theme = {
   /** const theme: {
     readonly color: "red";
@@ -971,12 +1018,12 @@ const theme = {
   backgroundColor: "blue",
 } as const;
 
-part1
+ex2
 export const color = "red" as const;
 let x = color;
 /** let x: "red" */
 
-part2
+ex3
 function foo () = {
   return {foo: "foo"} as const
 }
@@ -1007,6 +1054,7 @@ PATH.INDEX = "/";
 ##### Non-null assertion（使うべきではない、危険！）
 
 ```javascript
+ex1
 export function getFirstError(str?: string) {
 /** undefinedの可能性を、! で無理やり消し去る */
   return str!.charAt(0);
@@ -1027,8 +1075,284 @@ export function getFirstError(str?: string) {
 - 外部のパッケージの型が間違っている場合に==型を書き換えるために使う==
 
 ```javascript
+ex1
 export function getFirstError(str: number) {
   return (str as unknown as string).charAt(0);
   /** strを一旦、unknownに変更してから、stringに変更となる */
 }
+```
+
+## #15 Index Signature と Mapped types
+
+### Index Signature
+
+- どのような時に使うか
+  - オブジェクトのプロパティを==動的に追加したい時に使う==
+  - 型を追記することで、型を絞り込むことができない
+
+```javascript
+ex1;
+export type User = {
+  name: string,
+  [key: string]: string /** key の部分はなんでも良い 例)aaaa */,
+  /** []の部分が、Index Signature */
+};
+
+const user: User = {
+  name: "きゅん",
+  account: "kyun_it",
+  job: "Engineer",
+};
+```
+
+- 型が増えていく時に、Union types に追記しなければならないのはデメリット
+
+```javascript
+ex1;
+export type User = {
+  name: string,
+  age: number,
+  [key: string]: string | number,
+  /** number型を追記し、Union typeにすることでエラーを回避できる */
+};
+
+const user: User = {
+  name: "きゅん",
+  age: 47,
+  account: "kyun_it",
+  job: "Engineer",
+};
+```
+
+- 指定していないプロパティを設定すると、`undefined`では無く、型が指定されてしまうのがデメリット
+
+```javascript
+ex1;
+user.firstName;
+/** (index) User[string]: string | number */
+```
+
+### Mapped types
+
+- 汎用的
+- Typescript でも色々なことに応用できる
+
+① オブジェクトのプロパティ名を限定するときに使える
+② ジェネリクスと組み合わせて便利な型をつくり出す時に使える
+
+```javascript
+ex1
+export type User = {
+  name: string;
+} & PersonalData;
+
+type PersonalData = {
+  //   height: number;
+  //   weight: number;
+  [key in "height" | "weight"]: number;
+};
+
+const user: User = {
+  name: "きゅん",
+  height: 176,
+  weight: 80,
+};
+```
+
+- `[key in 〇〇]`の型を別の型から参照することができる
+
+```javascript
+ex1
+export type User = {
+  name: string;
+} & PersonalData;
+
+type Foo = "height" | "weight";
+
+type PersonalData = {
+  //   height: number;
+  //   weight: number;
+  [key in Foo]: number;
+};
+
+ex2: keyofを使う
+
+type Foo = {
+  height: number;
+  weight: number;
+};
+
+type PersonalData = {
+  [key in keyof Foo]: number;
+};
+
+ex3: 変数から値を参照する
+
+const foo = {
+  height: 200;
+  weight: 100;
+};
+
+type PersonalData = {
+  [key in keyof typeof foo]: number;
+};
+
+ex4: オプショナルにすることにより、一括で指定する
+注: Index Signatureではできない
+export type User = {
+  name: string;
+} & PersonalData;
+
+type PersonalData = {
+  /**
+    type PersonalData = {
+    height?: number | undefined;
+    weight?: number | undefined;
+  */
+  [key in "height" | "weight"]?: number;
+};
+
+ex5:一括でオプショナル指定できる
+type PersonalData = {
+  height: number;
+  weight: number;
+};
+
+type OptionalPersonalData = {
+  [k in keyof PersonalData]?: PersonalData[k];
+
+  /**
+    type OptionalPersonalData = {
+    height?: number | undefined;
+    weight?: number | undefined;
+} */
+};
+
+ex6:オプショナルを必須にする方法
+type PersonalData = {
+  height?: number;
+  weight?: number;
+};
+
+type RequiredPersonalData = {
+  [k in keyof PersonalData]-?: PersonalData[k];
+  /** Mapped typesで、「-」:ハイフンをオプショナル前に追記する  */
+};
+```
+
+## #16 type Guard
+
+#### type Guard とは
+
+- 型の絞り込み
+- 型が複数存在する場合、タイプガードを使うことによって型を特定していくこと
+
+#### type Guard の種類（基礎的）
+
+##### typeof を使った Type Guard
+
+- if 文の中の`return` を忘れるとコードのなかが実行されない
+- `return`によって、型の絞り込みが可能
+
+```javascript
+ex1;
+export const foo = (value: string | number | boolean) => {
+  if (typeof value === "string") {
+    return value; // value: string
+  }
+  if (typeof value === "number") {
+    return value; // value: number
+  }
+  return value; // value: boolean
+};
+```
+
+#### js のメソッドや演算子を使った Type Guard
+
+```javascript
+ex1;
+export const foo = (value: string | string[]) => {
+  if (Array.isArray(value)) {
+    /** isArrayは、引数が配列かどうか判断する */
+    return value; // value: string[]
+  }
+
+  return value;
+};
+```
+
+#### 演算子を使った例
+
+```javascript
+export const foo = (value?: string) => {
+  if (!value) {
+    // value: string | undefined
+    return value;
+  }
+
+  return value;
+  //  value: string
+};
+```
+
+#### in 演算子を使った Type Guard
+
+- プロパティ:`nickName` が、UserB にしか指定がない場合（==全てにプロパティが指定されていない==）
+
+```javascript
+ex1;
+type UserA = { name: string };
+type UserB = { name: string, nickName: string };
+
+export const foo = (value: UserA | UserB) => {
+  if ("nickName" in value) {
+    // valueのなかに"nickNameがあるかどうか精査"
+    return value; // UserB
+  }
+
+  return value; // UserA
+};
+```
+
+#### タグ付き Union Types を使った Type Guard(Discriminated Union, Tagged Union)
+
+- プロパティ:`nickName` が、全てにが指定されている場合
+- 実践でかなり使われる手法
+
+```javascript
+ex1: if文;
+type UserA = { name: string, lang: "ja" };
+type UserB = { name: string, lang: "en" };
+
+export const foo = (value: UserA | UserB) => {
+  if (value.lang === "ja") {
+    // valueのlangが、"ja"なら〜"
+    return value; // UserA
+  }
+
+  return value; // User B
+};
+
+ex2: switch文;
+type UserA = { name: string, lang: "ja" };
+type UserB = { name: string, lang: "en" };
+type UserC = { name: string, lang: "fr" };
+
+export const foo = (value: UserA | UserB | UserC) => {
+  switch (value.lang) {
+    case "ja": {
+      return value;
+    }
+    case "en": {
+      return value;
+    }
+    case "fr": {
+      return value;
+    }
+    default: {
+      throw new Error("lang is not defined!");
+      return value;
+    }
+  }
+};
 ```
