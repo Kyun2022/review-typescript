@@ -1762,3 +1762,508 @@ export type NextPage<Props = {}, InitialProps = Props> = NextComponentType<
   Props
 >
 ```
+
+## #21Conditional Types と infer
+
+#### Conditional Types とは
+
+- 型の条件分岐を行なって型の推論を行うためのもの
+
+```javascript
+ex1:基本
+type Props = {
+  id: string;
+  name: string;
+  age: number;
+};
+
+type FilterString<T> = {
+  [k in keyof T]: T[k] extends string ? k : never;
+}[keyof T];
+
+type StringKeys = FilterString<Props>;
+/** type StringKeys = "id" | "name" */
+
+
+ex2:異なった記法
+type Filter<T, U> = {
+  [k in keyof T]: T[k] extends U ? k : never;
+}[keyof T];
+
+type StringKeys = Filter<Props, string>;
+/** type StringKeys = "id" | "name" */
+
+type NumberKeys = Filter<Props, number>;
+/** type NumberKeys = "age" */
+
+type BooleanKeys = Filter<Props, boolean>;
+/** type BooleanKeys = never */
+```
+
+==- `<T>`には、`type Props` の型が格納==
+==- `[k in keyof T]`は、`T` のキーが、`K` に格納する==
+==- `T[k]`は、`Lookup types` は、`value` を格納する==
+==- `T` は、Props==
+==- `K` `は、id`, `name`, `age`==
+==- `extends` は、`string` の互換性を満たすものが格納するかどうか==
+==- `string` の互換性は、`id`, `name` のみ満たす==
+==- `[keyof T]`で`id`, `name` の`value`が格納される==
+
+==- `string`が`U`に格納される==
+
+#### Infer とは
+
+- 部分的な型抽出のこと
+- `Conditional Types` と同時に使われる
+- 関数の返り値だけ必要な場合に使用される
+
+==- `(() => infer U)`の関数を満たしていれば、==
+==- `infer U`は、関数の返り値という部分的ものだけ==
+
+```javascript
+ex1:
+const foo = () => {
+  return "";
+};
+
+type Return<T> = T extends (() => infer U) ? U : never;
+
+type Foo = Return<typeof foo>;
+/** type Foo = string */
+
+ex2: numberを返して欲しい場合
+const foo = (id: string) => {
+  return 0;
+};
+
+type Return<T> = T extends (id: string) => infer U ? U : never;
+
+type Foo = Return<typeof foo>;
+/** type Foo = number */
+
+ex3: stringを返して欲しい場合
+const foo = (id: string) => {
+  return 0;
+};
+
+type Return<T> = T extends (id: infer U) => number ? U : never;
+
+type Foo = Return<typeof foo>;
+/** type Foo = string */
+
+ex4: 引数が複数の場合
+const foo = (id: string, name: string) => {
+  return 0;
+};
+
+type Return<T> = T extends (...args: infer U) => number ? U : never;
+
+type Foo = Return<typeof foo>;
+/** type Foo = [id: string, name: string] */
+
+ex5:stringだけ
+const foo = (id: string, name: string) => {
+  return 0;
+};
+
+type Return<T> = T extends (...args: [infer U, ...any[]]) => number ? U : never;
+
+type Foo = Return<typeof foo>;
+```
+
+## #22 実践でも多用される Utility Types
+
+- 便利な型のライブラリ集
+
+#### 型の変更をしなければならない場面がある
+
+- 関数の返り値の型が欲しい
+- オブジェクトのそれぞれのプロパティを`Readonly`にしたい
+
+```javascript
+ex1:Utility Typesを使った型操作
+
+const foo = (id: string, name: string) => {
+  return 0;
+};
+
+type Foo = ReturnType<typeof foo>;
+```
+
+#### Typescript が開発している Utility Types
+
+```javascript
+ex1: 基本の型;
+
+type User = {
+  name: string;
+  age: number | null;
+  country?: "US" | "UK" | "JP";
+};
+
+const user: User = {
+  name: "きゅん",
+  age: 47,
+};
+
+
+ex2: readonly: プロパティを変更させない;
+
+type User = {
+  name: string;
+  age: number | null;
+  country?: "US" | "UK" | "JP";
+};
+
+type ReadOnlyUser = Readonly<User>;
+
+const user: ReadOnlyUser = {
+  name: "きゅん",
+  age: 47,
+};
+
+user.age = 20; // エラーになる
+
+
+ex3: Partial: 各プロパティを optional にする;
+
+type User = {
+  name: string;
+  age: number | null;
+  country?: "US" | "UK" | "JP";
+};
+
+type PartialUser = Partial<User>;
+
+const user: PartialUser = {
+  name: "きゅん",
+};
+
+
+ex4: Required: 全てを必須にする
+
+type User = {
+  name: string;
+  age: number | null;
+  country?: "US" | "UK" | "JP";
+};
+
+type RequiredUser = Required<User>;
+
+const user: RequiredUser = {
+  name: "きゅん",
+  age: 47,
+  country: "UK",
+};
+
+
+ex5: Pick: オブジェクトがあった場合、必要なプロパティを選んで新しいオブジェクトを返す
+
+type User = {
+  name: string;
+  //   age: number | null;
+  country?: "US" | "UK" | "JP";
+};
+
+type PickUser = Pick<User, "name" | "country">; // 第2引数に必要な型
+
+const user: PickUser = {
+  name: "きゅん",
+  country: "UK",
+};
+
+
+ex6: Omit: 必要のないプロパティを排除して、新しいオブジェクト型を生成する
+
+type User = {
+  name: string;
+  //   age: number | null;
+  country?: "US" | "UK" | "JP";
+};
+
+type OmitUser = Omit<User, "age">; // 第2引数に不必要な型
+
+const user: OmitUser = {
+  name: "きゅん",
+  country: "UK",
+};
+
+
+ex7: Extract:第1型引数と第2型引数から互換性のある型だけを残して、新しい型を生成するもの
+
+type Foo = Extract<string | number, string>;
+/** type Foo = string */
+
+type Foo = Extract<"kyun" | number, string>;
+/** type Foo = "kyun" */
+
+
+ex8: Exclude: 第1型引数と第2型引数から互換性のない型だけを残して、新しい型を生成するもの
+
+type Foo = Exclude<string | number, string>;
+/** type Foo = number */
+
+
+ex9: NonNullable: 型引数で指定した型から、null と undefined を除いたもの
+
+type Foo = NonNullable<string | null | undefined>;
+/** type Foo = string */
+
+
+ex10: Record:
+・第1型引数が key で、第2型引数が value になる
+・オブジェクト型のkeyとプロパティの型を指定できる
+
+type Foo = Record<"hoge" | "fuga", number>;
+
+const obj: Foo = {
+  hoge: 1,
+  fuga: 2,
+  aaa: 3,  // エラーになる
+};
+
+
+ex11: Parameters: 関数の引数の型をTupleとして取得する
+
+function foo(a: string, b: number[], c: boolean) {
+  return;
+}
+
+type Foo = Parameters<typeof foo>;
+/** type Foo = [a: string, b: number[], c: boolean]type Foo = [a: string, b: number[], c: boolean] */
+
+
+ex12: Uppercase: 型引数名をすべて大文字にする
+
+type Foo = Uppercase<"kyun">
+/** type Foo = "KYUN" */
+
+
+ex13: Lowercase: 型引数名をすべて小文字にする
+
+type Foo = Lowercase<"KYUN">
+/** type Foo = "kyun" */
+
+
+ex14: Capitalize: 型引数名の先頭文字を大文字にする
+
+type Foo = Capitalize<"apple">;
+/** type Foo = "Apple" */
+
+
+ex15: Uncapitalize: 型引数名の先頭文字を小文字にする
+
+type Foo = Capitalize<"Apple">;
+/** type Foo = "apple" */
+
+```
+
+## #23 外部パッケージの Utility Types
+
+[type-fest](https://github.com/sindresorhus/type-fest)
+
+- メンテされていて、スター数も多め
+
+```javascript
+ex1: Partial
+
+type User = {
+  name: string;
+  age: number | null;
+  address: {
+    country: "US" | "UK" | "JP";
+  };
+};
+
+type PartialUser = Partial<User>;
+
+
+* ネストされた country には option が付与されない
+
+/** type PartialUser = {
+    name?: string | undefined;
+    age?: number | null | undefined;
+    address?: {
+        country: "US" | "UK" | "JP";
+    } | undefined;
+}
+ */
+
+const user: PartialUser = {
+  name: "きゅん",
+  address: {},  // エラーになる
+};
+
+
+ex2: PartialDeep: インストールが必要
+
+import { PartialDeep } from "type-fest";
+
+type User = {
+  name: string;
+  age: number | null;
+  address: {
+    country: "US" | "UK" | "JP";
+  };
+};
+
+type PartialUser = PartialDeep<User>;
+
+const user: PartialUser = {
+  name: "きゅん",
+  address: {},
+};
+
+/** type PartialUser = {
+    name?: string | undefined;
+    age?: number | null | undefined;
+    address?: PartialObjectDeep<{
+        country: "US" | "UK" | "JP";
+    }, {}> | undefined;
+}
+
+{ name: 'きゅん', address: {} }
+*/
+```
+
+## #24 型拡張の技術 ①
+
+#### なぜ学ぶ必要があるのか
+
+- 型がないものや型はあるが不十分なものに対して型を付けたり、拡張する
+
+#### 同じ名前空間で指定された定義された interface は、後から拡張可能
+
+```javascript
+
+ex1: 名前空間が同じでも、MyNamespace で囲むとエラーが消える
+
+export type User = {
+  name: string;
+};
+
+namespace MyNamespace {
+  export const name = "きゅん";
+  export type User = {   // exportが必要！
+    name: string;
+  };
+}
+
+type Foo = MyNamespace.User; // 補完あり
+const foo = MyNamespace.name; // 補完あり
+
+
+ex2: type → interfaceだとマージされる
+
+export type User = {
+  name: string;
+};
+
+namespace MyNamespace {
+  export interface User {
+    name: string;
+  }
+}
+
+namespace MyNamespace {
+  export interface User {
+    age: number;
+  }
+}
+
+type Foo = MyNamespace.User["name or age"]; // 補完が出現
+```
+
+#### アンビエント宣言(declare)
+
+- `declare`とは、`Typescript`に対して型の情報だけを伝える
+- 基本的には実装は含めてはならない
+- Js で型がない場合、typescript で扱うとき、後からアンビエント宣言で型を付与することができる
+
+```javascript
+ex1: declare
+
+declare var x: number;
+x = 0;
+
+ex2: アンビエントコンテキスト: exportの挙動が通常と異なる
+自動的にexportが付与される
+
+export type User = {
+  name: string;
+};
+
+declare namespace MyNamespace {
+  export interface User { //  アンビエントコンテキスト
+    name: string;
+  }
+}
+
+type Foo = MyNamespace.User;
+
+ex3:
+declare namespace MyNamespace {
+  interface User {  // exportが必要がない
+    name: string;
+  }
+}
+
+type Foo = MyNamespace.User;
+```
+
+#### アンビエントコンテキストを全体に反映させている `d.ts` 型定義ファイル
+
+##### ==module → import / export がある==
+
+##### ==script → import / export がない==
+
+```javascript
+/**
+ * 独立したexport宣言を持っていない場合( global: window配下にある状態 )
+ */
+
+var x: number;
+
+/**
+ * 独立していないexport宣言
+ */
+
+export const foo;
+
+/**
+ * 独立したexport宣言
+ */
+
+export {};
+export default baz;
+```
+
+#### 環境変数の型を拡張
+
+```javascript
+ex1: global.d.ts
+declare namespace NodeJS {
+  interface ProcessEnv {
+    readonly FOO: string;
+  }
+}
+
+// tsファイル
+process.env.FOO // 補完が出現
+
+
+ex2: global.d.ts
+
+declare global { // こちらで強制的にグローバル設定をすることができる
+  declare namespace NodeJS {
+    interface ProcessEnv {
+      readonly FOO: string;
+    }
+  }
+}
+
+export {}; // グローバルで無くなってしまう
+
+// tsファイル
+process.env.FOO // 補完が出現
+```
