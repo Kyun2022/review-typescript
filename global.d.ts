@@ -1,9 +1,4 @@
-declare global {
-  declare namespace NodeJS {
-    interface ProcessEnv {
-      readonly FOO: string;
-    }
-  }
+declare module "*.mp3" {
+  const data: string;
+  export default data;
 }
-
-export {};

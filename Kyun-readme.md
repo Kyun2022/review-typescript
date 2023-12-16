@@ -2267,3 +2267,134 @@ export {}; // グローバルで無くなってしまう
 // tsファイル
 process.env.FOO // 補完が出現
 ```
+
+## #25declare module を使って型定義を拡張する
+
+#### Js・Typescript において、==1 module = 1 ファイル==
+
+- 現代の開発は、`module`単位が基本
+
+```javascript
+
+ex1: 基本構文
+index.ts
+import foo from "foo";
+
+foo.bar // barの補完が出現
+
+global.d.ts
+declare module "foo" {
+  const bar: number;
+}
+ // 定義することで index.tsのエラーが消える
+```
+
+### モジュール拡張とアンビエントモジュールの違い
+
+- global.d.ts で記述
+- declare module の`{}の中`で記述すると==モジュール拡張==
+- declare module の`{}以外`で記述すると==アンビエントモジュール==
+
+```javascript
+ex: アンビエントモジュール:ファイル内にimportやexportがない
+
+declare module "foo" {
+  const bar: number;
+}
+
+ex: モジュール拡張:ファイル内にimportやexportがある
+import "react";
+
+declare module "foo" {
+  const bar: number;
+}
+```
+
+#### モジュール拡張とアンビエントモジュールの挙動の違い
+
+- 既存の型に型を追加するのが==モジュール拡張==
+- 既存の型に型があっても、上書きして新しく型を宣言するのが==アンビエントモジュール==
+
+```javascript
+ex1: アンビエントモジュール
+index.ts
+import { FC, bar } from "react";
+
+// FCが、exportされていないとエラーが出現
+
+global.d.ts
+declare module "react" {
+  const bar: number;
+}
+```
+
+#### declare module 内で定義したものが自動的に export になる
+
+- `declare module` 内に独立した `export` 宣言がないことが条件
+- `モジュール拡張`でも`アンビエントモジュール`でも同じ
+
+```javascript
+ex1: 独立したexport宣言がない
+index.ts
+import { bar } from "react"; // エラーなし
+
+global.d.ts
+declare module "react" {
+  const bar: number;
+}
+
+ex2: 独立したexport宣言がある
+index.ts
+import { bar } from "react"; // エラーあり
+
+global.d.ts
+declare module "react" {
+  const bar: number;
+  export default hoge;
+}
+```
+
+#### モジュール拡張とアンビエントモジュールの実践的な型拡張の例
+
+`CFC = className を持った FunctionComponent`
+
+```javascript
+ex1: CFCのコードジャンプも可能になる
+index.ts
+import { CFC, FC } from "react";
+
+const Component: CFC = (props) => {
+  return <div className={props.className}>test</div>;
+};
+
+
+global.d.ts
+import { FC } from "react";
+
+declare module "react" {
+  type CFC<p = {}> = FC<p & { className?: string }>;
+}
+
+```
+
+#### アンビエントモジュールの実践的な型拡張の例
+
+- `Js` がデフォルトで読み込めないファイルに対して型を定義する
+- 読み込んでも型エラーにならない
+- `webpack,Vite,SWC`などのバンドラーが`JS`が読み込めないファイルを処理している
+- 今回のファイルでは、`Next.js`の型定義を読み込んでいるから
+
+```javascript
+ex1: index.tsx: エラーにならない;
+import data from "kyun.jpg";
+
+ex2: index.tsx: エラーにならない;
+import data from "kyun.mp3";
+
+global.d.ts
+declare module "*.mp3" {
+  const data: string;
+  export default data;
+}
+
+```
