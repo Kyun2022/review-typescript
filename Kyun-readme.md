@@ -2485,5 +2485,96 @@ export default Home;
 
 ```
 
+## #補講
 
-## #27 
+#### Template Literal Types
+
+```javascript
+ex1:#が抜けているとエラーになる
+type Hex = `#${string}`;
+const red: Hex = "#ff0000";
+
+
+ex2: vが抜けていたり、versionの数字が抜けているとエラーになる
+type AppVersion = `v${number}.${number}.${number}`;
+const appVersion: AppVersion = "v1.2.0";
+
+```
+
+#### satisfies 演算子
+
+- typo を防ぎたい
+- 余剰プロパティを制限したい
+- ==🆖 型推論の結果が使えない==
+  👌 Mapped Types のアノテーションを消すと、型推論の結果が保持される
+- ==🆗 satisfies を使うことで解決できる==
+  - satisfies = 満足する、満たす
+
+```javascript
+ex1: オブジェクトの外側に `satisfies [type名]` を付与
+type Hex = `#${string}`;
+
+type Rgb = [number, number, number];
+
+type Colors = {
+  [color in "red" | "blue" | "green"]: Hex | Rgb;
+};
+
+const colors = {
+  red: "#ff0000",
+  blue: "#0000ff",
+  green: [0, 255, 0],
+  //   yellow: "#ffff00",
+} satisfies Colors;
+
+```
+
+#### 型が推論できない場面では、satisfies は使えず、アノテーションしかできない
+
+- satisfies は推論できるものに対して、型チェックできる
+
+```javascript
+
+ex1: satisfiesが使えない場面
+: fooの中に値が入っていないため、エラーになる
+
+🆗 let foo: string;
+🆖 let foo satisfies string;
+
+foo = 1
+```
+
+#### const assertion と satisfies の組み合わせ
+
+- `const assertion`で`readonly`にしたり、`widening`を防止できる
+
+```javascript
+type Hex = `#${string}`;
+
+type Rgb = readonly [number, number, number];
+
+type Colors = {
+  [color in "red" | "blue" | "green"]: Hex | Rgb;
+};
+
+const colors = {
+  red: "#ff0000",
+  blue: "#0000ff",
+  green: [0, 255, 0],
+  //   yellow: "#ffff00",
+} as const satisfies Colors;
+
+colors.green = [1, 2, 3];
+
+ex2: Mapped typesではない
+type Path = {
+  [key: string]: `/${string}`;
+};
+
+const path = {
+  index: "/",
+  about: "/about",
+} as const satisfies Path;
+
+
+```
